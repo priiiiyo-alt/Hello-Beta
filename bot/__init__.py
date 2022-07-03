@@ -106,11 +106,14 @@ rss_dict = {}
 
 AUTHORIZED_CHATS = set()
 SUDO_USERS = set()
+MOD_USERS = set()
 AS_DOC_USERS = set()
 AS_MEDIA_USERS = set()
 EXTENTION_FILTER = set(['.torrent'])
 LEECH_LOG = set()
+LEECH_LOG_ALT = set()
 MIRROR_LOGS = set()
+LINK_LOGS = set()
 try:
     aid = getConfig('AUTHORIZED_CHATS')
     aid = aid.split(' ')
@@ -123,6 +126,13 @@ try:
     aid = aid.split(' ')
     for _id in aid:
         SUDO_USERS.add(int(_id))
+except:
+    pass
+try:
+    schats = getConfig('MOD_USERS')
+    schats = schats.split(" ")
+    for chats in schats:
+        MOD_USERS.add(int(chats))
 except:
     pass
 try:
@@ -141,10 +151,24 @@ try:
 except:
     pass
 try:
+    aid = getConfig('LEECH_LOG_ALT')
+    aid = aid.split(' ')
+    for _id in aid:
+        LEECH_LOG_ALT.add(int(_id))
+except:
+    pass
+try:
     aid = getConfig('MIRROR_LOGS')
     aid = aid.split(' ')
     for _id in aid:
         MIRROR_LOGS.add(int(_id))
+except:
+    pass
+try:
+    aid = getConfig('LINK_LOGS')
+    aid = aid.split(' ')
+    for _id in aid:
+        LINK_LOGS.add(int(_id))
 except:
     pass
 try:
@@ -315,13 +339,6 @@ try:
 except:
     MEGA_LIMIT = None
 try:
-    STORAGE_THRESHOLD = getConfig('STORAGE_THRESHOLD')
-    if len(STORAGE_THRESHOLD) == 0:
-        raise KeyError
-    STORAGE_THRESHOLD = float(STORAGE_THRESHOLD)
-except:
-    STORAGE_THRESHOLD = None
-try:
     ZIP_UNZIP_LIMIT = getConfig('ZIP_UNZIP_LIMIT')
     if len(ZIP_UNZIP_LIMIT) == 0:
         raise KeyError
@@ -451,6 +468,44 @@ try:
 except:
     CRYPT = None
 try:
+    UNIFIED_EMAIL = getConfig('UNIFIED_EMAIL')
+    UNIFIED_PASS = getConfig('UNIFIED_PASS')
+    if len(UNIFIED_EMAIL) == 0 or len(UNIFIED_PASS) == 0:
+        raise KeyError
+except KeyError:
+    UNIFIED_EMAIL = None
+    UNIFIED_PASS = None
+try:
+    HUBDRIVE_CRYPT = getConfig('HUBDRIVE_CRYPT')
+    if len(HUBDRIVE_CRYPT) == 0:
+        raise KeyError
+except:
+    HUBDRIVE_CRYPT = None
+try:
+    KATDRIVE_CRYPT = getConfig('KATDRIVE_CRYPT')
+    if len(KATDRIVE_CRYPT) == 0:
+        raise KeyError
+except:
+    KATDRIVE_CRYPT = None
+try:
+    DRIVEFIRE_CRYPT = getConfig('DRIVEFIRE_CRYPT')
+    if len(DRIVEFIRE_CRYPT) == 0:
+        raise KeyError
+except:
+    DRIVEFIRE_CRYPT = None
+try:
+    XSRF_TOKEN = getConfig('XSRF_TOKEN')
+    if len(XSRF_TOKEN) == 0:
+        raise KeyError
+except:
+    XSRF_TOKEN = None
+try:
+    laravel_session = getConfig('laravel_session')
+    if len(laravel_session) == 0:
+        raise KeyError
+except:
+    laravel_session = None
+try:
     AUTHOR_NAME = getConfig('AUTHOR_NAME')
     if len(AUTHOR_NAME) == 0:
         AUTHOR_NAME = 'Arsh Sisodiya'
@@ -495,6 +550,31 @@ try:
 except KeyError:
     APPDRIVE_EMAIL = None
     APPDRIVE_PASS = None
+
+try:
+    FSUB = getConfig('FSUB')
+    FSUB = FSUB.lower() == 'true'
+except KeyError:
+    FSUB = False
+    
+try:
+    FSUB_CHANNEL_ID = int(getConfig('FSUB_CHANNEL_ID'))
+except KeyError:
+    FSUB_CHANNEL_ID = ""
+
+try:
+    CHANNEL_USERNAME: str = getConfig('CHANNEL_USERNAME').replace("@", "")
+    if len(CHANNEL_USERNAME) == 0:
+        CHANNEL_USERNAME = 'AnimeDynastyEN'
+except KeyError:
+    logging.warning('CHANNEL_USERNAME not provided')
+    CHANNEL_USERNAME = 'AnimeDynastyEN'
+
+try:
+    LEECH_ENABLED = getConfig('LEECH_ENABLED')
+    LEECH_ENABLED = LEECH_ENABLED.lower() == 'true'
+except KeyError:
+    LEECH_ENABLED = False
 
 try:
     TOKEN_PICKLE_URL = getConfig('TOKEN_PICKLE_URL')
