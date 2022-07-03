@@ -7,7 +7,7 @@ from sys import executable
 from telegram import InlineKeyboardMarkup
 from telegram.ext import CommandHandler
 
-from bot import bot, dispatcher, updater, botStartTime, IGNORE_PENDING_REQUESTS, LOGGER, Interval, LEECH_ENABLED, CHANNEL_USERNAME, BOT_PM, OWNER_ID, INCOMPLETE_TASK_NOTIFIER, DB_URI, app, main_loop
+from bot import bot, app, dispatcher, updater, botStartTime, IGNORE_PENDING_REQUESTS, alive, AUTHORIZED_CHATS, LOGGER, Interval, LEECH_ENABLED, CHANNEL_USERNAME, BOT_PM, OWNER_ID, INCOMPLETE_TASK_NOTIFIER, DB_URI, main_loop
 from .helper.ext_utils.fs_utils import start_cleanup, clean_all, exit_clean_up
 from .helper.ext_utils.telegraph_helper import telegraph
 from .helper.ext_utils.bot_utils import get_readable_file_size, get_readable_time
@@ -55,7 +55,7 @@ def stats(update, context):
 def start(update, context):
     buttons = ButtonMaker()
     buttons.buildbutton("Repo", "https://github.com/Appeza/tg-mirror-leech-bot")
-    buttons.buildbutton("Support Group", "https://t.me/tmlb_ ")
+    buttons.buildbutton("Support Group", "https://t.me/tmlb_updates")
     reply_markup = InlineKeyboardMarkup(buttons.build_menu(2))
     if CustomFilters.authorized_user(update) or CustomFilters.authorized_chat(update):
         start_string = f'''
