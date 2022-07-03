@@ -9,7 +9,7 @@ from bot.helper.telegram_helper.message_utils import sendMessage, sendMarkup, se
 from bot.helper.ext_utils.bot_utils import get_mega_link_type, get_readable_file_size
 from bot.helper.mirror_utils.status_utils.mega_download_status import MegaDownloadStatus
 from bot.helper.mirror_utils.upload_utils.gdriveTools import GoogleDriveHelper
-from bot.helper.ext_utils.fs_utils import get_base_name, check_storage_threshold
+from bot.helper.ext_utils.fs_utils import get_base_name
 
 
 class MegaAppListener(MegaListener):
