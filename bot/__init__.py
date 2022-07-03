@@ -136,14 +136,6 @@ try:
 except:
     pass
 try:
-    fx = getConfig('EXTENTION_FILTER')
-    if len(fx) > 0:
-        fx = fx.split(' ')
-        for x in fx:
-            EXTENTION_FILTER.add(x.lower())
-except:
-    pass
-try:
     aid = getConfig('LEECH_LOG')
     aid = aid.split(' ')
     for _id in aid:
@@ -169,6 +161,14 @@ try:
     aid = aid.split(' ')
     for _id in aid:
         LINK_LOGS.add(int(_id))
+except:
+    pass
+try:
+    fx = getConfig('EXTENSION_FILTER')
+    if len(fx) > 0:
+        fx = fx.split()
+        for x in fx:
+            EXTENSION_FILTER.add(x.strip().lower())
 except:
     pass
 try:
