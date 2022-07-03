@@ -414,9 +414,9 @@ class GoogleDriveHelper:
            retry=retry_if_exception_type(GCError))
     def __create_directory(self, directory_name, parent_id):
         file_metadata = {
-            "name": directory_name,
-            "description": "': f'{GD_INFO}',
-            "mimeType": self.__G_DRIVE_DIR_MIME_TYPE
+            'name': directory_name,
+            'description': f'{GD_INFO}',
+            'mimeType': self.__G_DRIVE_DIR_MIME_TYPE
         }
         if parent_id is not None:
             file_metadata["parents"] = [parent_id]
