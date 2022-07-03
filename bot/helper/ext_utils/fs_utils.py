@@ -111,7 +111,7 @@ def take_ss(video_file):
 
     return des_dir
 
-def re_split(path, size, file_, dirpath, split_size, start_time=0, i=1, inLoop=False):
+def split_file(path, size, file_, dirpath, split_size, start_time=0, i=1, inLoop=False):
     parts = ceil(size/TG_SPLIT_SIZE)
     if EQUAL_SPLITS and not inLoop:
         split_size = ceil(size/parts) + 1000
