@@ -12,7 +12,7 @@ from bot.helper.mirror_utils.status_utils.qbit_download_status import QbDownload
 from bot.helper.mirror_utils.upload_utils.gdriveTools import GoogleDriveHelper
 from bot.helper.telegram_helper.message_utils import sendMessage, sendMarkup, deleteMessage, sendStatusMessage, update_all_messages
 from bot.helper.ext_utils.bot_utils import getDownloadByGid, get_readable_file_size, get_readable_time, setInterval
-from bot.helper.ext_utils.fs_utils import clean_unwanted, get_base_name, check_storage_threshold
+from bot.helper.ext_utils.fs_utils import clean_unwanted, get_base_name
 from bot.helper.telegram_helper import button_build
 
 
