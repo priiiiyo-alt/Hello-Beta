@@ -7,7 +7,7 @@ from sys import executable
 from telegram import InlineKeyboardMarkup
 from telegram.ext import CommandHandler
 
-from bot import bot, dispatcher, updater, botStartTime, IGNORE_PENDING_REQUESTS, LOGGER, Interval, INCOMPLETE_TASK_NOTIFIER, DB_URI, app, main_loop
+from bot import bot, dispatcher, updater, botStartTime, IGNORE_PENDING_REQUESTS, LOGGER, Interval, LEECH_ENABLED, CHANNEL_USERNAME, BOT_PM, OWNER_ID, INCOMPLETE_TASK_NOTIFIER, DB_URI, app, main_loop
 from .helper.ext_utils.fs_utils import start_cleanup, clean_all, exit_clean_up
 from .helper.ext_utils.telegraph_helper import telegraph
 from .helper.ext_utils.bot_utils import get_readable_file_size, get_readable_time
@@ -54,8 +54,8 @@ def stats(update, context):
 
 def start(update, context):
     buttons = ButtonMaker()
-    buttons.buildbutton("Repo", "https://github.com/arshsisodiya/helios-mirror")
-    buttons.buildbutton("Support Group", "https://t.me/mirrorsociety")
+    buttons.buildbutton("Repo", "https://github.com/Appeza/tg-mirror-leech-bot")
+    buttons.buildbutton("Support Group", "https://t.me/tmlb_ ")
     reply_markup = InlineKeyboardMarkup(buttons.build_menu(2))
     if CustomFilters.authorized_user(update) or CustomFilters.authorized_chat(update):
         start_string = f'''
@@ -90,9 +90,8 @@ def log(update, context):
     sendLogFile(context.bot, update.message)
 
 
-help_string_telegraph = f'''<br>
-<b>/{BotCommands.HelpCommand}</b>: To get this message
-<br><br>
+mirror_help_string_telegraph = f'''<br>
+<b> Mirror Commands </b> <br><br>
 <b>/{BotCommands.MirrorCommand}</b> [download_url][magnet_link]: Start mirroring to Google Drive. Send <b>/{BotCommands.MirrorCommand}</b> for more help
 <br><br>
 <b>/{BotCommands.ZipMirrorCommand}</b> [download_url][magnet_link]: Start mirroring and upload the file/folder compressed with zip extension
@@ -105,35 +104,25 @@ help_string_telegraph = f'''<br>
 <br><br>
 <b>/{BotCommands.QbUnzipMirrorCommand}</b> [magnet_link][torrent_file][torrent_file_url]: Start mirroring using qBittorrent and upload the file/folder extracted from any archive extension
 <br><br>
-<b>/{BotCommands.LeechCommand}</b> [download_url][magnet_link]: Start leeching to Telegram, Use <b>/{BotCommands.LeechCommand} s</b> to select files before leeching
-<br><br>
-<b>/{BotCommands.ZipLeechCommand}</b> [download_url][magnet_link]: Start leeching to Telegram and upload the file/folder compressed with zip extension
-<br><br>
-<b>/{BotCommands.UnzipLeechCommand}</b> [download_url][magnet_link][torent_file]: Start leeching to Telegram and upload the file/folder extracted from any archive extension
-<br><br>
-<b>/{BotCommands.QbLeechCommand}</b> [magnet_link][torrent_file][torrent_file_url]: Start leeching to Telegram using qBittorrent, Use <b>/{BotCommands.QbLeechCommand} s</b> to select files before leeching
-<br><br>
-<b>/{BotCommands.QbZipLeechCommand}</b> [magnet_link][torrent_file][torrent_file_url]: Start leeching to Telegram using qBittorrent and upload the file/folder compressed with zip extension
-<br><br>
-<b>/{BotCommands.QbUnzipLeechCommand}</b> [magnet_link][torrent_file][torrent_file_url]: Start leeching to Telegram using qBittorrent and upload the file/folder extracted from any archive extension
-<br><br>
 <b>/{BotCommands.CloneCommand}</b> [drive_url][gdtot_url]: Copy file/folder to Google Drive
 <br><br>
 <b>/{BotCommands.CountCommand}</b> [drive_url][gdtot_url]: Count file/folder of Google Drive
-<br><br>
-<b>/{BotCommands.DeleteCommand}</b> [drive_url]: Delete file/folder from Google Drive (Only Owner & Sudo)
 <br><br>
 <b>/{BotCommands.WatchCommand}</b> [yt-dlp supported link]: Mirror yt-dlp supported link. Send <b>/{BotCommands.WatchCommand}</b> for more help
 <br><br>
 <b>/{BotCommands.ZipWatchCommand}</b> [yt-dlp supported link]: Mirror yt-dlp supported link as zip
 <br><br>
-<b>/{BotCommands.LeechWatchCommand}</b> [yt-dlp supported link]: Leech yt-dlp supported link
+<b>/{BotCommands.CancelMirror}</b>: Reply to the message by which the download was initiated and that download will be cancelled
 <br><br>
-<b>/{BotCommands.LeechZipWatchCommand}</b> [yt-dlp supported link]: Leech yt-dlp supported link as zip
+<b>/{BotCommands.ListCommand}</b> [query]: Search in Google Drive(s)
 <br><br>
-<b>/{BotCommands.LeechSetCommand}</b>: Leech settings
+<b>/{BotCommands.StatusCommand}</b>: Shows a status of all the downloads
 <br><br>
-<b>/{BotCommands.SetThumbCommand}</b>: Reply photo to set it as Thumbnail
+<b>/{BotCommands.StatsCommand}</b>: Show Stats of the machine the bot is hosted on
+'''
+sudo_help_string_telegraph = f'''<br>
+<b><br>Owner and Sudo only Commands</b> <br><br>
+<b>/{BotCommands.DeleteCommand}</b> [drive_url]: Delete file/folder from Google Drive (Only Owner & Sudo)
 <br><br>
 <b>/{BotCommands.RssListCommand}</b>: List all subscribed rss feed info
 <br><br>
@@ -143,23 +132,8 @@ help_string_telegraph = f'''<br>
 <br><br>
 <b>/{BotCommands.RssUnSubCommand}</b>: [Title]: Unubscribe rss feed by title
 <br><br>
-<b>/{BotCommands.RssSettingsCommand}</b>: Rss Settings
-<br><br>
-<b>/{BotCommands.CancelMirror}</b>: Reply to the message by which the download was initiated and that download will be cancelled
-<br><br>
 <b>/{BotCommands.CancelAllCommand}</b>: Cancel all downloading tasks
 <br><br>
-<b>/{BotCommands.ListCommand}</b> [query]: Search in Google Drive(s)
-<br><br>
-<b>/{BotCommands.SearchCommand}</b> [query]: Search for torrents with API
-<br>sites: <code>rarbg, 1337x, yts, etzv, tgx, torlock, piratebay, nyaasi, ettv</code><br><br>
-<b>/{BotCommands.StatusCommand}</b>: Shows a status of all the downloads
-<br><br>
-<b>/{BotCommands.StatsCommand}</b>: Show Stats of the machine the bot is hosted on
-'''
-
-
-sudo_help_string = f'''<br><br><b> Sudo/Owner Only Commands </b><br><br>
 <b>/{BotCommands.PingCommand}</b>: Check how long it takes to Ping the Bot
 <br><br>
 <b>/{BotCommands.AuthorizeCommand}</b>: Authorize a chat or a user to use the bot (Can only be invoked by Owner & Sudo of the bot)
@@ -179,16 +153,79 @@ sudo_help_string = f'''<br><br><b> Sudo/Owner Only Commands </b><br><br>
 <b>/{BotCommands.ShellCommand}</b>: Run commands in Shell (Only Owner)
 <br><br>
 <b>/{BotCommands.ExecHelpCommand}</b>: Get help for Executor module (Only Owner)
+'''
+
+leech_help_string_telegraph = f'''<br>
+<br>
+<b> Leech Commands </b> <br><br>
+<b>/{BotCommands.LeechCommand}</b> [download_url][magnet_link]: Start leeching to Telegram, Use <b>/{BotCommands.LeechCommand} s</b> to select files before leeching
 <br><br>
-<b>/{BotCommands.AddleechlogCommand}</b>: Add Leech Log
+<b>/{BotCommands.ZipLeechCommand}</b> [download_url][magnet_link]: Start leeching to Telegram and upload the file/folder compressed with zip extension
 <br><br>
-<b>/{BotCommands.RmleechlogCommand}</b>: Remove Leech Log
+<b>/{BotCommands.UnzipLeechCommand}</b> [download_url][magnet_link][torent_file]: Start leeching to Telegram and upload the file/folder extracted from any archive extension
+<br><br>
+<b>/{BotCommands.QbLeechCommand}</b> [magnet_link][torrent_file][torrent_file_url]: Start leeching to Telegram using qBittorrent, Use <b>/{BotCommands.QbLeechCommand} s</b> to select files before leeching
+<br><br>
+<b>/{BotCommands.QbZipLeechCommand}</b> [magnet_link][torrent_file][torrent_file_url]: Start leeching to Telegram using qBittorrent and upload the file/folder compressed with zip extension
+<br><br>
+<b>/{BotCommands.QbUnzipLeechCommand}</b> [magnet_link][torrent_file][torrent_file_url]: Start leeching to Telegram using qBittorrent and upload the file/folder extracted from any archive extension
+<br><br>
+<b>/{BotCommands.LeechWatchCommand}</b> [yt-dlp supported link]: Leech yt-dlp supported link
+<br><br>
+<b>/{BotCommands.LeechZipWatchCommand}</b> [yt-dlp supported link]: Leech yt-dlp supported link as zip
+<br><br>
+<b>/{BotCommands.LeechSetCommand}</b>: Leech settings
+<br><br>
+<b>/{BotCommands.SetThumbCommand}</b>: Reply photo to set it as Thumbnail
+'''
+
+if LEECH_ENABLED:
+    help = telegraph.create_page(
+        title='Mirror Hunter & Leech Help',
+        content=mirror_help_string_telegraph + leech_help_string_telegraph,
+    )["path"]
+else:
+    help = telegraph.create_page(
+        title='Mirror Hunter Help',
+        content=mirror_help_string_telegraph,
+    )["path"]
+
+
+if OWNER_ID:
+    try:
+        help = telegraph.create_page(
+        title='Mirror Hunter Help',
+        content=mirror_help_string_telegraph + leech_help_string_telegraph + sudo_help_string_telegraph,
+    )["path"]
+    except Exception as e:
+        LOGGER.warning(e)
+
+help_string = f'''
+/{BotCommands.PingCommand}: Check how long it takes to Ping the Bot
+
+/{BotCommands.AuthorizeCommand}: Authorize a chat or a user to use the bot (Can only be invoked by Owner & Sudo of the bot)
+
+/{BotCommands.UnAuthorizeCommand}: Unauthorize a chat or a user to use the bot (Can only be invoked by Owner & Sudo of the bot)
+
+/{BotCommands.AuthorizedUsersCommand}: Show authorized users (Only Owner & Sudo)
+
+/{BotCommands.AddSudoCommand}: Add sudo user (Only Owner)
+
+/{BotCommands.RmSudoCommand}: Remove sudo users (Only Owner)
+
+/{BotCommands.RestartCommand}: Restart and update the bot
+
+/{BotCommands.LogCommand}: Get a log file of the bot. Handy for getting crash reports
+
+/{BotCommands.ShellCommand}: Run commands in Shell (Only Owner)
+
+/{BotCommands.ExecHelpCommand}: Get help for Executor module (Only Owner)
 '''
 help_string = f'''
 Hei, Need Help!!
 '''
 help = telegraph.create_page(
-        title='Helios-Mirror Help',
+        title='TG-Mirror-Leech Help',
         content=help_string_telegraph + sudo_help_string,
     )["path"]
 
